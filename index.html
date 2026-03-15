@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicion de Seción (Login)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #11cba9 0%, #0b96a0bd 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #11cba9;
+            margin-bottom: 10px;
+            font-size: 2.8rem;
+        }
+        
+        .demo-section {
+            margin: 30px 0;
+            padding: 30px;
+            background-color: #f8f9ff;
+            border-radius: 15px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .demo-title {
+            color: #444;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #25fcb4, #0b96a0bd);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(37, 117, 252, 0.3);
+        }
+        
+        .result {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #f0f7ff;
+            border-radius: 10px;
+            border-left: 5px solid #25fcb4;
+            text-align: left;
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+            animation: fadeIn 0.5s;
+            line-height: 2;
+        }
+        
+        .result h3 {
+            color: #25fcb4;
+            margin-bottom: 10px;
+        }
+        
+        /* Estilos para el modal personalizado */
+        .custom-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .custom-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background-color: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        
+        .custom-modal.active .modal-content {
+            transform: scale(1);
+        }
+        
+        .modal-header {
+            background: linear-gradient(to right, #25fcb4, #0b96a0bd);
+            color: white;
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+        
+        .close-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .modal-body {
+            padding: 30px 25px;
+        }
+        
+        .modal-message {
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            color: #444;
+            line-height: 1.5;
+        }
+        
+        .modal-input {
+            width: 80%;
+            padding: 15px;
+            border: 2px solid #e0e4f0;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            transition: border-color 0.3s;
+            margin-bottom: 25px;
+        }
+        
+        .modal-input:focus {
+            outline: none;
+            border-color: #25fcb4;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            padding: 20px 25px;
+            background-color: #f8f9ff;
+        }
+        
+        .modal-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .modal-btn.cancel {
+            background-color: #f1f3f9;
+            color: #666;
+        }
+        
+        .modal-btn.cancel:hover {
+            background-color: #e4e8f5;
+        }
+        
+        .modal-btn.confirm {
+            background: linear-gradient(to right, #25fcb4, #10a00bbd);
+            color: white;
+        }
+        
+        .modal-btn.confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(37, 117, 252, 0.3);
+        }
+        
+        .modal-btn.confirm:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        footer {
+            margin-top: 10px;
+            color: white;
+            text-align: center;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Inicion de Sesión</h1>        
+        <div class="demo-section">
+            <h2 class="demo-title">Bienvenido</h2>
+            <p>Haz clic en los botones para ingresar sus datos.</p>
+            
+            <div class="btn-group">
+                <button id="simplePromptBtn" class="btn btn-primary">
+                    Ingrese su Nombre de Usuario
+                </button>
+                <button id="validationPromptBtn" class="btn btn-primary">
+                    Ingrese su Correo
+                </button>
+                <button id="passwordPromptBtn" class="btn btn-primary">
+                    Ingrese su Contraseña
+                </button>
+            </div>
+        </div>
+        
+        <div id="result" class="result">
+            <h3>Datos:</h3>
+            <p id="resultText1"></p>
+            <p id="resultText2"></p>
+            <p id="resultText3"></p>
+        </div>
+    </div>
+    
+    <!-- Modal personalizado para el prompt -->
+    <div id="customPrompt" class="custom-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="promptTitle">Prompt Personalizado</div>
+                <button class="close-btn" id="closePromptBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-message" id="promptMessage">Por favor, ingresa un valor:</p>
+                <input type="text" class="modal-input" id="promptInput" placeholder="Escribe aquí...">
+                <p id="validationMessage" style="color: #e74c3c; font-size: 0.9rem; margin-top: -15px; margin-bottom: 20px; display: none;"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn cancel" id="cancelPromptBtn">Cancelar</button>
+                <button class="modal-btn confirm" id="confirmPromptBtn" disabled>Aceptar</button>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>JD Productions</p>
+    </footer>
+
+    <script>
+        // Elementos del DOM
+        const simplePromptBtn = document.getElementById('simplePromptBtn');
+        const validationPromptBtn = document.getElementById('validationPromptBtn');
+        const passwordPromptBtn = document.getElementById('passwordPromptBtn');
+        const customPrompt = document.getElementById('customPrompt');
+        const closePromptBtn = document.getElementById('closePromptBtn');
+        const cancelPromptBtn = document.getElementById('cancelPromptBtn');
+        const confirmPromptBtn = document.getElementById('confirmPromptBtn');
+        const promptInput = document.getElementById('promptInput');
+        const promptTitle = document.getElementById('promptTitle');
+        const promptMessage = document.getElementById('promptMessage');
+        const validationMessage = document.getElementById('validationMessage');
+        const result = document.getElementById('result');
+        const resultText = document.getElementById('resultText');
+        
+        // Variables para controlar el prompt
+        let currentResolve = null;
+        let currentReject = null;
+        let validationFunction = null;
+        let inputType = 'text';
+        
+        // Función para mostrar el prompt personalizado
+        function showCustomPrompt(options = {}) {
+            // Configurar opciones por defecto
+            const {
+                title = 'Prompt Personalizado',
+                message = 'Por favor, ingresa un valor:',
+                defaultValue = '',
+                placeholder = 'Escribe aquí...',
+                validation = null,
+                type = 'text'
+            } = options;
+            
+            // Aplicar configuración
+            promptTitle.textContent = title;
+            promptMessage.textContent = message;
+            promptInput.value = defaultValue;
+            promptInput.placeholder = placeholder;
+            validationFunction = validation;
+            inputType = type;
+            
+            // Configurar tipo de input
+            if (type === 'password') {
+                promptInput.type = 'password';
+            } else {
+                promptInput.type = 'text';
+            }
+            
+            // Reiniciar estado
+            validationMessage.style.display = 'none';
+            confirmPromptBtn.disabled = defaultValue === '';
+            
+            // Mostrar modal
+            customPrompt.classList.add('active');
+            //promptInput.focus();
+            //promptInput.select();
+            
+            // Devolver una promesa
+            return new Promise((resolve, reject) => {
+                currentResolve = resolve;
+                currentReject = reject;
+            });
+        }
+        
+        // Función para cerrar el prompt
+        function closePrompt() {
+            customPrompt.classList.remove('active');
+            promptInput.value = '';
+            validationMessage.style.display = 'none';
+            
+            // Limpiar referencias
+            currentResolve = null;
+            currentReject = null;
+            validationFunction = null;
+        }
+        
+        // Función para manejar la confirmación
+        function handleConfirm() {
+            const value = promptInput.value;
+            
+            // Validar si es necesario
+            if (validationFunction) {
+                const validationResult = validationFunction(value);
+                if (validationResult !== true) {
+                    validationMessage.textContent = validationResult;
+                    validationMessage.style.display = 'block';
+                    return;
+                }
+            }
+            
+            // Resolver la promesa con el valor ingresado
+            if (currentResolve) {
+                currentResolve(value);
+            }
+            
+            closePrompt();
+        }
+        
+        // Función para manejar la cancelación
+        function handleCancel() {
+            // Rechazar la promesa con null (similar al prompt nativo)
+            if (currentReject) {
+                currentReject(null);
+            }
+            
+            closePrompt();
+        }
+        
+        // Función para validar email
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email) {
+                return 'El email no puede estar vacío';
+            }
+            if (!emailRegex.test(email)) {
+                return 'Por favor ingresa un email válido';
+            }
+            return true;
+        }
+        
+        // Función para mostrar resultado
+        function showResult(text,i) {
+            if(i===0)resultText1.textContent = text;
+            else if(i===1)resultText2.textContent = text;
+            else resultText3.textContent = text;
+            result.classList.add('show');
+        }
+        
+        // Event Listeners
+        simplePromptBtn.addEventListener('click', () => {
+            showCustomPrompt({
+                title: 'Prompt Simple',
+                message: 'Por favor, ingresa tu nombre:',
+                placeholder: 'Ej: Juan Pérez'
+            })
+            .then(value => {
+                if (value) {
+                    showResult(`Has ingresado tu nombre: "${value}"`,0);
+                } else {
+                    showResult('Has cancelado el prompt.',0);
+                }
+            });
+        });
+        
+        validationPromptBtn.addEventListener('click', () => {
+            showCustomPrompt({
+                title: 'Prompt con Validación',
+                message: 'Por favor, ingresa tu dirección de email:',
+                placeholder: 'ejemplo@correo.com',
+                validation: validateEmail
+            })
+            .then(value => {
+                if (value) {
+                    showResult(`Email válido ingresado: "${value}"`,1);
+                } else {
+                    showResult('Has cancelado el prompt.',1);
+                }
+            });
+        });
+        
+        passwordPromptBtn.addEventListener('click', () => {
+            showCustomPrompt({
+                title: 'Prompt de Contraseña',
+                message: 'Por favor, ingresa tu contraseña:',
+                type: 'password',
+                validation: (value) => {
+                    if (!value) {
+                        return 'La contraseña no puede estar vacía';
+                    }
+                    if (value.length < 6) {
+                        return 'La contraseña debe tener al menos 6 caracteres';
+                    }
+                    return true;
+                }
+            })
+            .then(value => {
+                if (value) {
+                    // En una aplicación real, no mostraríamos la contraseña
+                    showResult(`Contraseña ingresada correctamente (${value.length} caracteres): "${value}"`,2);
+                } else {
+                    showResult('Has cancelado el prompt.',2);
+                }
+            });
+        });
+        
+        closePromptBtn.addEventListener('click', handleCancel);
+        cancelPromptBtn.addEventListener('click', handleCancel);
+        confirmPromptBtn.addEventListener('click', handleConfirm);
+        
+        // Validación en tiempo real
+        promptInput.addEventListener('input', () => {
+            const value = promptInput.value;
+            confirmPromptBtn.disabled = value === '';
+            validationMessage.style.display = 'none';
+        });
+        
+        ///*
+        // Permitir presionar Enter para confirmar
+        promptInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter' && promptInput.value.trim() !== '') {
+                handleConfirm();
+            }
+        });
+        
+        // Cerrar con Escape (similar al prompt nativo)
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && customPrompt.classList.contains('active')) {
+                handleCancel();
+            }
+        });
+        
+
+        // Cerrar haciendo clic fuera del modal
+        customPrompt.addEventListener('click', (event) => {
+            if (event.target === customPrompt) {
+                handleCancel();
+            }
+        });
+        //*/
+        
+
+    </script>
+</body>
+</html>
