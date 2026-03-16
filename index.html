@@ -255,14 +255,45 @@
             text-align: center;
             opacity: 0.8;
         }
+
+        .dt {
+            margin-top: 40px;
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .t {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: linear-gradient(to right, #25fcb4, #0b96a0bd);
+            color: white;
+            position: top 10px;
+        }
+        
+        .t:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(37, 117, 252, 0.3);
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Inicion de Sesión</h1>        
+        <h1 id="titu">Inicion de Sesión</h1>        
         <div class="demo-section">
-            <h2 class="demo-title">Bienvenido</h2>
-            <p>Haz clic en los botones para ingresar sus datos.</p>
+            <h2 class="demo-title" id="demo">Bienvenido</h2>
+            <p id="tex">Haz clic en los botones para ingresar sus datos.</p>
             
             <div class="btn-group">
                 <button id="simplePromptBtn" class="btn btn-primary">
@@ -278,10 +309,14 @@
         </div>
         
         <div id="result" class="result">
-            <h3>Datos:</h3>
+            <h3 id="d">Datos:</h3>
             <p id="resultText1"></p>
             <p id="resultText2"></p>
             <p id="resultText3"></p>
+        </div>
+
+        <div class="dt">
+        <button id="t" class="t">Traductor</button>
         </div>
     </div>
     
@@ -411,7 +446,7 @@
         function handleCancel() {
             // Rechazar la promesa con null (similar al prompt nativo)
             if (currentReject) {
-                currentReject(null);
+                //currentReject(null);
             }
             
             closePrompt();
@@ -423,8 +458,11 @@
             if (!email) {
                 return 'El email no puede estar vacío';
             }
-            if (!emailRegex.test(email)) {
+            if (!emailRegex.test(email) && tt) {
                 return 'Por favor ingresa un email válido';
+            }
+            if (!emailRegex.test(email) && !tt) {
+                return 'Please enter a valid email';
             }
             return true;
         }
@@ -439,23 +477,39 @@
         
         // Event Listeners
         simplePromptBtn.addEventListener('click', () => {
+            if(tt){
             showCustomPrompt({
-                title: 'Prompt Simple',
+                title: 'Nombre',
                 message: 'Por favor, ingresa tu nombre:',
                 placeholder: 'Ej: Juan Pérez'
             })
             .then(value => {
                 if (value) {
-                    showResult(`Has ingresado tu nombre: "${value}"`,0);
+                    if(tt)showResult(`Has ingresado tu nombre: "${value}"`,0);
                 } else {
                     showResult('Has cancelado el prompt.',0);
                 }
             });
+            }else{
+            showCustomPrompt({
+                title: 'Name',
+                message: 'Please, enter your name:',
+                placeholder: 'Example: Juan Pérez'
+            })
+            .then(value => {
+                if (value) {
+                    if(!tt)showResult(`You have entered your name: "${value}"`,0);
+                } else {
+                    showResult('prompt cancelled.',0);
+                }
+            });
+            }
         });
         
         validationPromptBtn.addEventListener('click', () => {
+            if(tt){
             showCustomPrompt({
-                title: 'Prompt con Validación',
+                title: 'Correo',
                 message: 'Por favor, ingresa tu dirección de email:',
                 placeholder: 'ejemplo@correo.com',
                 validation: validateEmail
@@ -467,11 +521,27 @@
                     showResult('Has cancelado el prompt.',1);
                 }
             });
+            }else{
+            showCustomPrompt({
+                title: 'Email',
+                message: 'Please, enter your email:',
+                placeholder: 'example@email.com',
+                validation: validateEmail
+            })
+            .then(value => {
+                if (value) {
+                    showResult(`Valid email entered: "${value}"`,1);
+                } else {
+                    showResult('prompt cancelled.',1);
+                }
+            });    
+            }
         });
         
         passwordPromptBtn.addEventListener('click', () => {
+            if(tt){
             showCustomPrompt({
-                title: 'Prompt de Contraseña',
+                title: 'Contraseña',
                 message: 'Por favor, ingresa tu contraseña:',
                 type: 'password',
                 validation: (value) => {
@@ -492,6 +562,31 @@
                     showResult('Has cancelado el prompt.',2);
                 }
             });
+            }else{
+            showCustomPrompt({
+                title: 'Password',
+                message: 'Please, enter your password:',
+                placeholder: 'Write here...',
+                type: 'password',
+                validation: (value) => {
+                    if (!value) {
+                        return 'The password can\'t be empty';
+                    }
+                    if (value.length < 6) {
+                        return 'The password should have at least 6 characters';
+                    }
+                    return true;
+                }
+            })
+            .then(value => {
+                if (value) {
+                    // En una aplicación real, no mostraríamos la contraseña
+                    showResult(`Password entered correctly (${value.length} characters): "${value}"`,2);
+                } else {
+                    showResult('Prompt cancelled.',2);
+                }
+            });    
+            }
         });
         
         closePromptBtn.addEventListener('click', handleCancel);
@@ -529,7 +624,49 @@
         });
         //*/
         
+        tt=true;
+        const t = document.getElementById('t');
+        const titu = document.getElementById('titu');
+        const demo = document.getElementById('demo');
+        const tex = document.getElementById('tex');
+        const d = document.getElementById('d');
+        
 
+        t.addEventListener('click', (event) => {
+            if(tt){
+                simplePromptBtn.textContent = "Enter your Nickname";
+                validationPromptBtn.textContent = "Enter your Email";
+                passwordPromptBtn.textContent = "Enter your Password";
+                d.textContent = "Data";
+                t.textContent = "Translator";
+                titu.textContent = "Login";
+                demo.textContent = "Wellcome";
+                tex.textContent = "Click on the buttons to enter your information.";
+                cancelPromptBtn.textContent = "Cancel";
+                confirmPromptBtn.textContent = "Confirm";
+                tt=false;
+                result.classList.remove('show');
+                resultText1.textContent = '';
+                resultText2.textContent = '';
+                resultText3.textContent = '';
+            }else{
+                simplePromptBtn.textContent = "Ingrese su Nombre de Usuario";
+                validationPromptBtn.textContent = "Ingrese su Correo";
+                passwordPromptBtn.textContent = "Ingrese su Contraseña";
+                d.textContent = "Datos";
+                t.textContent = "Traductor";
+                titu.textContent = "Inicio de Sesión";
+                demo.textContent = "Bienvenido";
+                tex.textContent = "Haz clic en los botones para ingresar sus datos.";
+                cancelPromptBtn.textContent = "Cancelar";
+                confirmPromptBtn.textContent = "Confirmar";
+                tt=true;
+                result.classList.remove('show');
+                resultText1.textContent = '';
+                resultText2.textContent = '';
+                resultText3.textContent = '';
+            }
+        });
     </script>
 </body>
 </html>
